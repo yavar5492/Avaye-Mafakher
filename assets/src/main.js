@@ -51,6 +51,25 @@ function renderTopics() {
   topicsGrid.innerHTML = html;
 }
 
+// ─── ===== تابع قوی اسکرول به بالا ===== ───
+function scrollToTop() {
+  // روش اول: برای مرورگرهای مدرن
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: 'smooth'
+  });
+
+  // روش دوم: برای اطمینان بیشتر
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+
+  // روش سوم: با استفاده از anchor
+  if (window.location.hash) {
+    window.location.hash = '';
+  }
+}
+
 // ─── ===== تغییر صفحه ===== ───
 function navigate(pageName, pushState) {
   if (pushState === undefined) pushState = true;
@@ -64,7 +83,8 @@ function navigate(pageName, pushState) {
     target.classList.add('active');
   }
 
-  window.scrollTo(0, 0);
+  // ===== اسکرول فوری به بالا =====
+  scrollToTop();
 
   var navLinks = document.querySelectorAll('.nav-links a');
   for (var j = 0; j < navLinks.length; j++) {
@@ -129,6 +149,12 @@ function openTopic(id) {
 
   navigate('article', false);
   history.pushState({ page: 'article', id: id }, '', '/topic/' + id);
+
+  // ===== اسکرول چندباره برای اطمینان =====
+  setTimeout(scrollToTop, 50);
+  setTimeout(scrollToTop, 150);
+  setTimeout(scrollToTop, 300);
+  setTimeout(scrollToTop, 500);
 }
 
 
@@ -243,7 +269,7 @@ window.showToast = showToast;
 function initParticles() {
   var canvas = document.getElementById('particles-canvas');
   if (!canvas) return;
-  
+
   var ctx = canvas.getContext('2d');
   var W, H, dots;
 

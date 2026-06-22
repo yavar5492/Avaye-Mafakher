@@ -199,10 +199,8 @@ nav {
 /* ===== MOBILE MENU ===== */
 .mobile-menu {
   display: flex;
-  /* flex-direction: column; */
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
   top: 250px;
    visibility: hidden;
   transform: translateX(-500px);
@@ -589,7 +587,7 @@ nav {
 /* ===== ARTICLE ===== */
 .article-wrap {
   max-width: 780px;
-  margin: 0 auto;
+  margin: 80px auto 0;
   padding: 24px 0 40px;
 }
 .back-btn {
@@ -618,7 +616,7 @@ nav {
 .article-title {
   font-size: clamp(1.8rem, 4vw, 2.8rem);
   font-weight: 900;
-  margin: 12px 0 8px;
+  margin: 8px 0;
   line-height: 1.25;
 }
 .article-meta {
