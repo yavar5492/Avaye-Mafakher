@@ -2,72 +2,50 @@
 <html lang="fa" dir="rtl">
 
 <head>
-    <!-- ===== META TAGS ===== -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- ===== SEO META TAGS ===== -->
     <title>درباره ما | آوای مفاخر</title>
-    <meta name="description"
-        content="آوای مفاخر؛ پلتفرمی تخصصی برای معرفی شخصیت‌های تأثیرگذار تاریخ ایران و جهان. با ما همراه باشید." />
-    <meta name="keywords"
-        content="آوای مفاخر, مشاهیر, شخصیت‌های تاریخی, تاریخ ایران, مفاخر ایران, فرهنگ, تمدن" />
+    <meta name="description" content="آوای مفاخر؛ پلتفرمی تخصصی برای معرفی شخصیت‌های تأثیرگذار تاریخ ایران و جهان." />
+    <meta name="keywords" content="آوای مفاخر, مشاهیر, شخصیت‌های تاریخی, تاریخ ایران" />
     <meta name="author" content="آوای مفاخر" />
     <meta name="robots" content="index, follow" />
 
-    <!-- ===== OPEN GRAPH ===== -->
     <meta property="og:title" content="درباره ما | آوای مفاخر" />
-    <meta property="og:description"
-        content="آوای مفاخر؛ پلتفرمی تخصصی برای معرفی شخصیت‌های تأثیرگذار تاریخ ایران و جهان." />
+    <meta property="og:description" content="آوای مفاخر؛ پلتفرمی تخصصی برای معرفی شخصیت‌های تأثیرگذار تاریخ ایران و جهان." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://avayemofakher.ir/pages/about.html" />
-    <meta property="og:image" content="https://avayemofakher.ir/assets/images/og-image.jpg" />
     <meta property="og:locale" content="fa_IR" />
 
-    <!-- ===== TWITTER CARD ===== -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="درباره ما | آوای مفاخر" />
-    <meta name="twitter:description"
-        content="آوای مفاخر؛ پلتفرمی تخصصی برای معرفی شخصیت‌های تأثیرگذار تاریخ ایران و جهان." />
-    <meta name="twitter:image" content="https://avayemofakher.ir/assets/images/og-image.jpg" />
 
-    <!-- ===== THEME & PWA ===== -->
     <meta name="theme-color" content="#0b0a14" />
     <link rel="icon" type="image/png" href="../assets/icon/favicon.png" />
-    <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 
-    <!-- ===== FONTS ===== -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
 
-    <!-- ===== STYLES ===== -->
     <link rel="stylesheet" href="../assets/style/style.css" />
-
-    <!-- ===== JAVASCRIPT مشترک (همون فایل اصلی index.js) ===== -->
-    <script type="module" src="../assets/src/main.js"></script>
 </head>
 
 <body>
 
-    <!-- ===== CANVAS (پس‌زمینه ذرات) ===== -->
     <canvas id="particles-canvas"></canvas>
 
-    <!-- ===== APP ===== -->
     <div class="app">
 
-        <!-- ══════════════════ NAVBAR ══════════════════ -->
+        <!-- ===== NAVBAR ===== -->
         <div class="navbar">
             <nav>
                 <div class="nav-logo" onclick="window.location.href='../index.html'">
                     <img width="120px" src="../assets/icon/iconfav.png" alt="آوای مفاخر" />
                 </div>
                 <ul class="nav-links">
-                    <li><a href="../index.html" id="nav-home">خانه</a></li>
-                    <li><a href="../index.html" onclick="if(window.navigate)window.navigate('topics')" id="nav-topics">موضوعات</a></li>
-                    <li><a href="#" class="active" id="nav-about">درباره ما</a></li>
-                    <li><a href="../index.html#contact" onclick="if(window.navigate)window.navigate('home')">ارتباط با ما</a></li>
+                    <li><a href="../index.html">خانه</a></li>
+                    <li><a href="../index.html">موضوعات</a></li>
+                    <li><a href="#" class="active">درباره ما</a></li>
+                    <li><a href="../index.html#contact">ارتباط با ما</a></li>
                 </ul>
                 <button class="hamburger" id="hamburger" onclick="window.toggleMenu()" aria-label="منو">
                     <span></span><span></span><span></span>
@@ -79,27 +57,22 @@
 
         <div class="mobile-meno-box">
             <div class="mobile-menu" id="mobile-menu">
-                <a href="../index.html">🏠 خانه</a>
-                <a href="../index.html" onclick="if(window.navigate)window.navigate('topics')">📚 موضوعات</a>
-                <a href="#" class="active">👥 درباره ما</a>
-                <a href="../index.html#contact" onclick="if(window.navigate)window.navigate('home')">📬 ارتباط با ما</a>
+                <a href="../index.html"><img width="25px" src="../assets/icon/Home.png" alt="" /> خانه</a>
+                <a href="../index.html"><img width="25px" src="../assets/icon/Document.png" alt="" /> موضوعات</a>
+                <a href="#" class="active"><img width="25px" src="../assets/icon/2 User.png" alt="" /> درباره ما</a>
+                <a href="../index.html#contact"><img width="25px" src="../assets/icon/Calling.png" alt="" /> ارتباط با ما</a>
             </div>
         </div>
 
-        <!-- ══════════════════ محتوای اختصاصی درباره ما ══════════════════ -->
-        <div class="page active" id="page-about">
+        <!-- ===== محتوای درباره ما - بدون کلاس page ===== -->
+        <div style="margin-top: 110px;">
 
-            <!-- ===== هدر درباره ما ===== -->
             <section class="about-hero">
                 <span class="hero-badge">آشنایی با ما</span>
                 <h1>درباره <span style="background:linear-gradient(135deg,var(--primary),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">آوای مفاخر</span></h1>
-                <p>
-                    ما با عشق به تاریخ و فرهنگ، زندگی و آثار بزرگان ایران و جهان را روایت می‌کنیم.
-                    اینجا جایی است که صدای مفاخر در گذر زمان طنین‌انداز می‌شود.
-                </p>
+                <p>ما با عشق به تاریخ و فرهنگ، زندگی و آثار بزرگان ایران و جهان را روایت می‌کنیم.</p>
             </section>
 
-            <!-- ===== درباره ما (تاریخچه) ===== -->
             <div style="margin: 20px 0 8px;">
                 <div class="section-eyebrow" style="text-align:center;">تاریخچه</div>
                 <h2 class="section-title" style="text-align:center;">داستان شکل‌گیری آوای مفاخر</h2>
@@ -108,20 +81,11 @@
 
             <div class="glass-card" style="padding:32px 28px;margin-bottom:40px;">
                 <p style="color:var(--text-muted);line-height:2;font-size:1.05rem;text-align:justify;">
-                    [متن تستی] آوای مفاخر در سال ۱۴۰۰ با هدف زنده نگه داشتن یاد و نام شخصیت‌های تأثیرگذار تاریخ ایران و جهان پا به عرصه وجود گذاشت. 
-                    ایده اولیه این مجموعه زمانی شکل گرفت که گروهی از پژوهشگران و علاقه‌مندان به تاریخ، متوجه خلأ بزرگی در فضای مجازی برای 
-                    معرفی مستند و عمیق مفاخر شدند. 
-                    <br /><br />
-                    ما معتقدیم هر شخصیت بزرگ، پیامی برای نسل امروز دارد و شناخت آنان، نه تنها به هویت ملی ما عمق می‌بخشد، 
-                    بلکه راهگشای آینده‌ای روشن‌تر خواهد بود. به همین دلیل، از همان ابتدا تصمیم گرفتیم با تکیه بر منابع معتبر 
-                    و پژوهش‌های دقیق، محتوایی ماندگار و ارزشمند تولید کنیم.
-                    <br /><br />
-                    امروز، آوای مفاخر به خانواده‌ای از پژوهشگران، نویسندگان و هنرمندان تبدیل شده است که با عشق و تعهد، 
-                    روایت‌گر زندگی بزرگان هستند و این مسیر را با افتخار ادامه می‌دهند.
+                    آوای مفاخر با هدف زنده نگه داشتن یاد و نام شخصیت‌های تأثیرگذار تاریخ ایران و جهان شکل گرفته است. 
+                    ایده اولیه این مجموعه از یک علاقه شخصی به تاریخ و فرهنگ آغاز شد.
                 </p>
             </div>
 
-            <!-- ===== چشم‌انداز ===== -->
             <div style="margin: 40px 0 8px;">
                 <div class="section-eyebrow" style="text-align:center;">چشم‌انداز</div>
                 <h2 class="section-title" style="text-align:center;">آینده‌ای که برای آن تلاش می‌کنیم</h2>
@@ -130,27 +94,116 @@
 
             <div class="glass-card" style="padding:32px 28px;margin-bottom:40px;">
                 <p style="color:var(--text-muted);line-height:2;font-size:1.05rem;text-align:justify;">
-                    [متن تستی] چشم‌انداز ما تبدیل شدن به معتبرترین و جامع‌ترین مرجع معرفی شخصیت‌های تأثیرگذار تاریخ 
-                    ایران و جهان در فضای مجازی است. می‌خواهیم آوای مفاخر پلی باشد میان نسل‌های گذشته و آینده، 
-                    تا هر کسی که به دنبال الگو، انگیزه و درس زندگی است، بتواند در میان روایت‌های ما، پاسخ سوالات خود را بیابد.
-                    <br /><br />
-                    ما در افق ۵ ساله خود، قصد داریم با تولید محتوای چندرسانه‌ای، مستندهای تصویری و برگزاری رویدادهای فرهنگی، 
-                    گامی مؤثر در جهت شناخت بهتر مفاخر و ترویج فرهنگ غنی ایران‌زمین برداریم.
+                    چشم‌انداز ما تبدیل شدن به مرجعی معتبر برای معرفی شخصیت‌های تأثیرگذار تاریخ ایران و جهان است.
                 </p>
             </div>
 
-        </div><!-- /page-about -->
+        </div>
 
-        <!-- ══════════════════ FOOTER ══════════════════ -->
         <footer>
             <p>© ۱۴۰۵ <span>آوای مفاخر</span> — تمامی حقوق محفوظ است</p>
         </footer>
 
-    </div><!-- /app -->
+    </div>
 
-    <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
 
-</body>
+    <script>
+        // فقط منوی موبایل
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
 
+        window.toggleMenu = function() {
+            hamburger.classList.toggle('open');
+            mobileMenu.classList.toggle('open');
+            document.querySelector('body').classList.toggle('bodylock');
+            document.querySelector('.allback').classList.toggle('display');
+        };
+
+        window.closeMenu = function() {
+            hamburger.classList.remove('open');
+            mobileMenu.classList.remove('open');
+            document.querySelector('body').classList.remove('bodylock');
+            document.querySelector('.allback').classList.remove('display');
+        };
+
+        document.querySelectorAll('.mobile-menu a').forEach(function(link) {
+            link.addEventListener('click', function() {
+                window.closeMenu();
+            });
+        });
+
+        // ذرات
+        (function initParticles() {
+            var canvas = document.getElementById('particles-canvas');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            var W, H, dots;
+
+            function resize() {
+                W = canvas.width = window.innerWidth;
+                H = canvas.height = window.innerHeight;
+            }
+
+            function makeDot() {
+                return {
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    r: Math.random() * 1.8 + 0.4,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    alpha: Math.random() * 0.5 + 0.15
+                };
+            }
+
+            function initParticlesArray() {
+                resize();
+                dots = [];
+                for (var i = 0; i < 90; i++) {
+                    dots.push(makeDot());
+                }
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, W, H);
+                for (var i = 0; i < dots.length; i++) {
+                    var d = dots[i];
+                    d.x += d.vx;
+                    d.y += d.vy;
+                    if (d.x < 0) d.x = W;
+                    if (d.x > W) d.x = 0;
+                    if (d.y < 0) d.y = H;
+                    if (d.y > H) d.y = 0;
+                    ctx.beginPath();
+                    ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(167,139,250,' + d.alpha + ')';
+                    ctx.fill();
+                }
+                for (var j = 0; j < dots.length; j++) {
+                    for (var k = j + 1; k < dots.length; k++) {
+                        var dx = dots[j].x - dots[k].x;
+                        var dy = dots[j].y - dots[k].y;
+                        var dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 100) {
+                            ctx.beginPath();
+                            ctx.moveTo(dots[j].x, dots[j].y);
+                            ctx.lineTo(dots[k].x, dots[k].y);
+                            var opacity = 0.12 * (1 - dist / 100);
+                            ctx.strokeStyle = 'rgba(167,139,250,' + opacity + ')';
+                            ctx.lineWidth = 0.6;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(draw);
+            }
+            window.addEventListener('resize', resize);
+            initParticlesArray();
+            draw();
+        })();
+
+        console.log('✅ درباره ما با موفقیت بارگذاری شد!');
+    </script>
+
+</body>
 </html>
