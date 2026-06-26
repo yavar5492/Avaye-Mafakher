@@ -4,7 +4,6 @@
 
 // ─── ===== وارد کردن داده‌ها ===== ───
 import { topicsData } from '../json/data.js';
-
 // ─── ===== متغیرهای وضعیت ===== ───
 let currentPage = '';
 let currentTopicTitle = '';
@@ -330,6 +329,26 @@ function initParticles() {
 
   var ctx = canvas.getContext('2d');
   var W, H, dots;
+  var particleRGB = { r: 167, g: 139, b: 250 };
+  var targetRGB = { r: 167, g: 139, b: 250 };
+
+  function readParticleColor() {
+    var raw = getComputedStyle(document.documentElement).getPropertyValue('--particle-color').trim();
+    var parts = raw.split(',');
+    return {
+      r: parseInt(parts[0], 10),
+      g: parseInt(parts[1], 10),
+      b: parseInt(parts[2], 10)
+    };
+  }
+
+  function lerpChannel(from, to, amount) {
+    return Math.round(from + (to - from) * amount);
+  }
+
+  function syncParticleTarget() {
+    targetRGB = readParticleColor();
+  }
 
   function resize() {
     W = canvas.width = window.innerWidth;
@@ -356,6 +375,12 @@ function initParticles() {
   }
 
   function draw() {
+    particleRGB.r = lerpChannel(particleRGB.r, targetRGB.r, 0.08);
+    particleRGB.g = lerpChannel(particleRGB.g, targetRGB.g, 0.08);
+    particleRGB.b = lerpChannel(particleRGB.b, targetRGB.b, 0.08);
+
+    var colorBase = particleRGB.r + ',' + particleRGB.g + ',' + particleRGB.b;
+
     ctx.clearRect(0, 0, W, H);
 
     for (var i = 0; i < dots.length; i++) {
@@ -370,7 +395,7 @@ function initParticles() {
 
       ctx.beginPath();
       ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(167,139,250,' + d.alpha + ')';
+      ctx.fillStyle = 'rgba(' + colorBase + ',' + d.alpha + ')';
       ctx.fill();
     }
 
@@ -385,7 +410,7 @@ function initParticles() {
           ctx.moveTo(dots[j].x, dots[j].y);
           ctx.lineTo(dots[k].x, dots[k].y);
           var opacity = 0.12 * (1 - dist / 100);
-          ctx.strokeStyle = 'rgba(167,139,250,' + opacity + ')';
+          ctx.strokeStyle = 'rgba(' + colorBase + ',' + opacity + ')';
           ctx.lineWidth = 0.6;
           ctx.stroke();
         }
@@ -395,7 +420,94 @@ function initParticles() {
     requestAnimationFrame(draw);
   }
 
+  syncParticleTarget();
+  window.addEventListener('themechange', syncParticleTarget);
   window.addEventListener('resize', resize);
   initParticlesArray();
   draw();
+}
+// ===== theme.js — مدیریت دارک/لایت مود =====
+
+const THEME_KEY = 'theme';
+const TRANSITION_MS = 450;
+let transitionTimer = null;
+
+export function getTheme() {
+  return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function startThemeTransition() {
+  if (prefersReducedMotion()) return;
+
+  document.documentElement.classList.add('theme-transition');
+
+  if (transitionTimer) clearTimeout(transitionTimer);
+
+  transitionTimer = setTimeout(function () {
+    document.documentElement.classList.remove('theme-transition');
+    transitionTimer = null;
+  }, TRANSITION_MS);
+}
+
+function updateThemeUI(theme) {
+  var isDark = theme === 'dark';
+  var label = isDark ? 'فعال‌سازی حالت روشن' : 'فعال‌سازی حالت تاریک';
+  var mobileLabel = isDark ? 'حالت روشن' : 'حالت تاریک';
+
+  var btn = document.getElementById('theme-toggle');
+  if (btn) {
+    btn.setAttribute('aria-label', label);
+    btn.setAttribute('title', label);
+  }
+
+  var mobileBtn = document.getElementById('theme-toggle-mobile');
+  if (mobileBtn) {
+    mobileBtn.setAttribute('aria-label', label);
+    mobileBtn.setAttribute('title', label);
+    var textEl = mobileBtn.querySelector('.theme-toggle-label');
+    if (textEl) textEl.textContent = mobileLabel;
+  }
+
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) {
+    meta.setAttribute('content', isDark ? '#0b0a14' : '#f5f4fa');
+  }
+}
+
+export function setTheme(theme, animate) {
+  if (animate !== false) {
+    startThemeTransition();
+  }
+
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem(THEME_KEY, theme);
+  updateThemeUI(theme);
+  window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: theme } }));
+}
+
+export function toggleTheme() {
+  setTheme(getTheme() === 'dark' ? 'light' : 'dark', true);
+}
+
+export function initTheme() {
+  var saved = localStorage.getItem(THEME_KEY);
+  var theme = saved === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  updateThemeUI(theme);
+}
+
+window.toggleTheme = toggleTheme;
+
+function bootTheme() {
+  initTheme();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootTheme);
+} else {
+  bootTheme();
 }

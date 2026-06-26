@@ -19,6 +19,14 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="درباره ما | آوای مفاخر" />
 
+    <!-- ===== THEME (جلوگیری از فلش) ===== -->
+    <script>
+        (function () {
+            var t = localStorage.getItem('theme');
+            if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+
     <meta name="theme-color" content="#0b0a14" />
     <link rel="icon" type="image/png" href="../assets/icon/favicon.png" />
 
@@ -27,6 +35,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="../assets/style/style.css" />
+    <script type="module" src="../assets/src/theme.js"></script>
 </head>
 
 <body>
@@ -47,9 +56,25 @@
                     <li><a href="#" class="active">درباره ما</a></li>
                     <li><a href="../index.html#contact">ارتباط با ما</a></li>
                 </ul>
-                <button class="hamburger" id="hamburger" onclick="window.toggleMenu()" aria-label="منو">
-                    <span></span><span></span><span></span>
-                </button>
+                <div class="nav-actions">
+                    <button type="button" class="theme-toggle" id="theme-toggle" onclick="window.toggleTheme()"
+                        aria-label="فعال‌سازی حالت روشن" title="فعال‌سازی حالت روشن">
+                        <svg class="theme-icon theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="4" />
+                            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+                        </svg>
+                        <svg class="theme-icon theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                        </svg>
+                    </button>
+                    <button class="hamburger" id="hamburger" onclick="window.toggleMenu()" aria-label="منو">
+                        <span></span><span></span><span></span>
+                    </button>
+                </div>
             </nav>
         </div>
 
@@ -61,6 +86,23 @@
                 <a href="../index.html"><img width="25px" src="../assets/icon/Document.png" alt="" /> موضوعات</a>
                 <a href="#" class="active"><img width="25px" src="../assets/icon/2 User.png" alt="" /> درباره ما</a>
                 <a href="../index.html#contact"><img width="25px" src="../assets/icon/Calling.png" alt="" /> ارتباط با ما</a>
+                <button type="button" class="theme-toggle-mobile" id="theme-toggle-mobile"
+                    onclick="window.toggleTheme()" aria-label="فعال‌سازی حالت روشن" title="فعال‌سازی حالت روشن">
+                    <span class="theme-toggle-mobile-icon" aria-hidden="true">
+                        <svg class="theme-icon theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="4" />
+                            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+                        </svg>
+                        <svg class="theme-icon theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                        </svg>
+                    </span>
+                    <span class="theme-toggle-label">حالت روشن</span>
+                </button>
             </div>
         </div>
 
@@ -139,6 +181,26 @@
             if (!canvas) return;
             var ctx = canvas.getContext('2d');
             var W, H, dots;
+            var particleRGB = { r: 167, g: 139, b: 250 };
+            var targetRGB = { r: 167, g: 139, b: 250 };
+
+            function readParticleColor() {
+                var raw = getComputedStyle(document.documentElement).getPropertyValue('--particle-color').trim();
+                var parts = raw.split(',');
+                return {
+                    r: parseInt(parts[0], 10),
+                    g: parseInt(parts[1], 10),
+                    b: parseInt(parts[2], 10)
+                };
+            }
+
+            function lerpChannel(from, to, amount) {
+                return Math.round(from + (to - from) * amount);
+            }
+
+            function syncParticleTarget() {
+                targetRGB = readParticleColor();
+            }
 
             function resize() {
                 W = canvas.width = window.innerWidth;
@@ -165,6 +227,12 @@
             }
 
             function draw() {
+                particleRGB.r = lerpChannel(particleRGB.r, targetRGB.r, 0.08);
+                particleRGB.g = lerpChannel(particleRGB.g, targetRGB.g, 0.08);
+                particleRGB.b = lerpChannel(particleRGB.b, targetRGB.b, 0.08);
+
+                var colorBase = particleRGB.r + ',' + particleRGB.g + ',' + particleRGB.b;
+
                 ctx.clearRect(0, 0, W, H);
                 for (var i = 0; i < dots.length; i++) {
                     var d = dots[i];
@@ -176,7 +244,7 @@
                     if (d.y > H) d.y = 0;
                     ctx.beginPath();
                     ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-                    ctx.fillStyle = 'rgba(167,139,250,' + d.alpha + ')';
+                    ctx.fillStyle = 'rgba(' + colorBase + ',' + d.alpha + ')';
                     ctx.fill();
                 }
                 for (var j = 0; j < dots.length; j++) {
@@ -189,7 +257,7 @@
                             ctx.moveTo(dots[j].x, dots[j].y);
                             ctx.lineTo(dots[k].x, dots[k].y);
                             var opacity = 0.12 * (1 - dist / 100);
-                            ctx.strokeStyle = 'rgba(167,139,250,' + opacity + ')';
+                            ctx.strokeStyle = 'rgba(' + colorBase + ',' + opacity + ')';
                             ctx.lineWidth = 0.6;
                             ctx.stroke();
                         }
@@ -197,6 +265,9 @@
                 }
                 requestAnimationFrame(draw);
             }
+
+            syncParticleTarget();
+            window.addEventListener('themechange', syncParticleTarget);
             window.addEventListener('resize', resize);
             initParticlesArray();
             draw();
