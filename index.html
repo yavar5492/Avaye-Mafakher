@@ -16,7 +16,7 @@
     <meta name="robots" content="index, follow" />
     <meta name="language" content="Persian" />
 
-    <!-- ===== OPEN GRAPH (اجتماعی) ===== -->
+    <!-- ===== OPEN GRAPH ===== -->
     <meta property="og:title" content="آوای مفاخر | گنجینه شخصیت‌های تأثیرگذار تاریخ" />
     <meta property="og:description"
         content="آوای مفاخر؛ پلتفرمی تخصصی برای معرفی شخصیت‌های تأثیرگذار تاریخ ایران و جهان. با بزرگان تاریخ، بزرگتر زندگی کن." />
@@ -33,9 +33,9 @@
         content="آوای مفاخر؛ پلتفرمی تخصصی برای معرفی شخصیت‌های تأثیرگذار تاریخ ایران و جهان." />
     <meta name="twitter:image" content="https://avayemofakher.ir/assets/images/og-image.jpg" />
 
-    <!-- ===== THEME (جلوگیری از فلش) ===== -->
+    <!-- ===== THEME ===== -->
     <script>
-        (function () {
+        (function() {
             var t = localStorage.getItem('theme');
             if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
         })();
@@ -55,13 +55,21 @@
 
     <!-- ===== STYLES ===== -->
     <link rel="stylesheet" href="assets/style/style.css" />
-    <!-- ===== JAVASCRIPT ===== -->
+
+    <!-- ===== JSPDF ===== -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+</script>
+    <!-- ===== MAIN JS ===== -->
     <script type="module" defer src="assets/src/main.js"></script>
 </head>
 
 <body>
 
-    <!-- ===== CANVAS (پس‌زمینه ذرات) ===== -->
+    <!-- ===== CANVAS ===== -->
     <canvas id="particles-canvas"></canvas>
 
     <!-- ===== APP ===== -->
@@ -70,35 +78,38 @@
         <!-- ══════════════════ NAVBAR ══════════════════ -->
         <div class="navbar">
             <nav>
-            <div class="nav-logo" onclick="window.navigate('home')"><img width="120px" src="assets/icon/iconfav.png" alt="logo"></div>
-            <ul class="nav-links">
-                <li><a href="#" onclick="window.navigate('home');return false;" id="nav-home">خانه</a></li>
-                <li><a href="#" onclick="window.navigate('topics');return false;" id="nav-topics">موضوعات</a></li>
-                <li><a href="#about" onclick="window.navigate('home');window.scrollTo('about');return false;">درباره
-                        ما</a></li>
-                <li><a href="#contact" onclick="window.navigate('home');window.scrollTo('contact');return false;">ارتباط
-                        با ما</a></li>
-            </ul>
-            <div class="nav-actions">
-                <button type="button" class="theme-toggle" id="theme-toggle" onclick="window.toggleTheme()"
-                    aria-label="فعال‌سازی حالت روشن" title="فعال‌سازی حالت روشن">
-                    <svg class="theme-icon theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" aria-hidden="true">
-                        <circle cx="12" cy="12" r="4" />
-                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-                    </svg>
-                    <svg class="theme-icon theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" aria-hidden="true">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                    </svg>
-                </button>
-                <button class="hamburger" id="hamburger" onclick="window.toggleMenu()" aria-label="منو">
-                    <span></span><span></span><span></span>
-                </button>
-            </div>
-        </nav>
+                <div class="nav-logo" onclick="window.navigate('home')">
+                    <img width="120px" src="assets/icon/iconfav.png" alt="logo">
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#" onclick="window.navigate('home');return false;" id="nav-home" class="active">خانه</a>
+                    </li>
+                    <li><a href="#" onclick="window.navigate('topics');return false;" id="nav-topics">موضوعات</a></li>
+                    <li><a href="pages/about.html">درباره ما</a></li>
+                    <li><a href="#contact"
+                            onclick="window.navigate('home');window.scrollTo('contact');return false;">ارتباط با ما</a>
+                    </li>
+                </ul>
+                <div class="nav-actions">
+                    <button type="button" class="theme-toggle" id="theme-toggle" onclick="window.toggleTheme()"
+                        aria-label="فعال‌سازی حالت روشن" title="فعال‌سازی حالت روشن">
+                        <svg class="theme-icon theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="4" />
+                            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+                        </svg>
+                        <svg class="theme-icon theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                        </svg>
+                    </button>
+                    <button class="hamburger" id="hamburger" onclick="window.toggleMenu()" aria-label="منو">
+                        <span></span><span></span><span></span>
+                    </button>
+                </div>
+            </nav>
         </div>
 
         <div class="allback"></div>
@@ -106,38 +117,42 @@
         <!-- Mobile Menu -->
         <div class="mobile-meno-box">
             <div class="mobile-menu" id="mobile-menu">
-            <a href="#" onclick="window.navigate('home');window.closeMenu();return false;"><img width="25px" src="assets/icon/Home.png" alt=""> خانه</a>
-            <a href="#" onclick="window.navigate('topics');window.closeMenu();return false;"><img width="25px" src="assets/icon/Document.png" alt=""> موضوعات</a>
-            <a href="#"
-                onclick="window.navigate('home');setTimeout(()=>window.scrollTo('about'),100);window.closeMenu();return false;"><img width="25px" src="assets/icon/2 User.png" alt="">
-                درباره ما</a>
-            <a href="#"
-                onclick="window.navigate('home');setTimeout(()=>window.scrollTo('contact'),100);window.closeMenu();return false;"><img width="25px" src="assets/icon/Calling.png" alt="">
-                ارتباط با ما</a>
-            <button type="button" class="theme-toggle-mobile" id="theme-toggle-mobile"
-                onclick="window.toggleTheme()" aria-label="فعال‌سازی حالت روشن" title="فعال‌سازی حالت روشن">
-                <span class="theme-toggle-mobile-icon" aria-hidden="true">
-                    <svg class="theme-icon theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="4" />
-                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-                    </svg>
-                    <svg class="theme-icon theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                    </svg>
-                </span>
-                <span class="theme-toggle-label">حالت روشن</span>
-            </button>
+                <a href="#" onclick="window.navigate('home');window.closeMenu();return false;">
+                    <img width="25px" src="assets/icon/Home.png" alt=""> خانه
+                </a>
+                <a href="#" onclick="window.navigate('topics');window.closeMenu();return false;">
+                    <img width="25px" src="assets/icon/Document.png" alt=""> موضوعات
+                </a>
+                <a href="pages/about.html" onclick="window.closeMenu();return false;">
+                    <img width="25px" src="assets/icon/2 User.png" alt=""> درباره ما
+                </a>
+                <a href="#"
+                    onclick="window.navigate('home');setTimeout(()=>window.scrollTo('contact'),100);window.closeMenu();return false;">
+                    <img width="25px" src="assets/icon/Calling.png" alt=""> ارتباط با ما
+                </a>
+                <button type="button" class="theme-toggle-mobile" id="theme-toggle-mobile"
+                    onclick="window.toggleTheme()" aria-label="فعال‌سازی حالت روشن" title="فعال‌سازی حالت روشن">
+                    <span class="theme-toggle-mobile-icon" aria-hidden="true">
+                        <svg class="theme-icon theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="4" />
+                            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+                        </svg>
+                        <svg class="theme-icon theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                        </svg>
+                    </span>
+                    <span class="theme-toggle-label">حالت روشن</span>
+                </button>
+            </div>
         </div>
 
-        </div>
         <!-- ══════════════════ PAGE: HOME ══════════════════ -->
         <div class="page active" id="page-home">
 
-            <!-- Hero -->
             <section class="hero">
                 <div class="hero-badge">پلتفرم اطلاعات عمومی</div>
                 <h1>با بزرگان تاریخ، بزرگتر زندگی کن</h1>
@@ -147,32 +162,23 @@
                 </div>
             </section>
 
-            <!-- About Section -->
             <section class="section" id="about">
                 <div class="section-eyebrow">درباره ما</div>
                 <h2 class="section-title">ما که هستیم؟</h2>
                 <div class="glow-divider"></div>
                 <p class="section-desc">آوای مفاخر پلتفرمی تخصصی برای معرفی شخصیت‌های تأثیرگذار تاریخ ایران و جهان است.
                     ما در این مجموعه با نگاهی عمیق و مستند، زندگی، آثار و میراث بزرگان را روایت می‌کنیم.
-
                     از کوروش کبیر و فردوسی تا اینشتین و استیو جابز؛ تمامی کسانی که مسیر تاریخ را تغییر دادند، در اینجا
                     جای دارند. هدف ما، زنده نگه داشتن یاد مفاخر و انتقال آموزه‌های آنان به نسل امروز است.
-
-                    تیم مشاهیر متشکل از پژوهشگران، نویسندگان و علاقه‌مندان به تاریخ و فرهنگ است که با عشق و دقت، هر
-                    روایت را به نگارش درمی‌آورند. ما معتقدیم شناخت بزرگان، کلید درک بهتر گذشته، حال و آینده است.
-
                 </p>
-                
-                    <a href="pages/about.html" class="btn btn-ghost">درباره ما بیشتر بدانید</a>
+                <a href="pages/about.html" class="btn btn-ghost">درباره ما بیشتر بدانید</a>
             </section>
 
-            <!-- Contact Section -->
             <section class="section" id="contact">
                 <div class="section-eyebrow">ارتباط با ما</div>
                 <h2 class="section-title">با ما در تماس باشید</h2>
                 <div class="glow-divider"></div>
                 <p class="section-desc">سؤال، پیشنهاد یا همکاری دارید؟ خوشحال می‌شویم از شما بشنویم.</p>
-
                 <div class="contact-grid" style="margin-bottom:2rem;">
                     <a href="https://mail.google.com/mail/?view=cm&fs=1&to=yavar3424@gmail.com" target="_blank">
                         <div class="glass-card contact-item">
@@ -193,8 +199,6 @@
                         </div>
                     </a>
                 </div>
-
-
             </section>
 
             <footer>
@@ -210,8 +214,21 @@
                 <div class="glow-divider"></div>
                 <p class="section-desc">موضوع مورد نظر خود را انتخاب کنید تا مقاله کامل را بخوانید.</p>
             </div>
+
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="جستجوی موضوعات ..." />
+                    <button class="search-icon" id="searchBtn" onclick="window.searchTopics()" aria-label="جستجو">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
             <div class="topics-grid" id="topics-grid">
-                <!-- Skeletons while loading -->
                 <div class="glass-card" style="height:220px;">
                     <div class="skeleton" style="height:100%;border-radius:12px;"></div>
                 </div>
@@ -222,8 +239,14 @@
                     <div class="skeleton" style="height:100%;border-radius:12px;"></div>
                 </div>
             </div>
+
+            <div class="no-results" id="noResults">
+                <span><img width="50px" src="assets/icon/Search.png" alt=""></span>
+                <p>هیچ موضوعی با جستجوی شما یافت نشد.</p>
+            </div>
+
             <footer>
-                <p>© ۱۴۰۳ <span>آوای مفاخر</span> — تمامی حقوق محفوظ است</p>
+                <p>© 1405 <span>آوای مفاخر</span> — تمامی حقوق محفوظ است</p>
             </footer>
         </div>
 
@@ -239,17 +262,29 @@
                     <span id="article-read"></span>
                 </div>
                 <div class="article-body" id="article-body"></div>
+
+                <!-- ===== دکمه دانلود PDF ===== -->
+                <div style="display: flex; justify-content: center; margin-top: 40px;">
+                    <button class="btn btn-primary download-pdf-btn" id="downloadPdfBtn"
+                        onclick="window.downloadArticlePdf()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        دانلود به صورت PDF
+                    </button>
+                </div>
             </div>
             <footer>
                 <p>© 1405 <span>آوای مفاخر</span> — تمامی حقوق محفوظ است</p>
             </footer>
         </div>
 
-    </div><!-- /app -->
+    </div>
 
-    <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
-
 
 </body>
 
