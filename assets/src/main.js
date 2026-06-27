@@ -9,65 +9,321 @@ import { topicsData } from '../json/data.js';
 let currentPage = '';
 let currentTopicTitle = '';
 let currentTopicId = '';
+let selectedCategory = '';
+let allTopicsData = [];
 
 // ─── ===== گرفتن المان‌های DOM ===== ───
 const pageHome = document.getElementById('page-home');
 const pageTopics = document.getElementById('page-topics');
 const pageArticle = document.getElementById('page-article');
-const topicsGrid = document.getElementById('topics-grid');
 const mobileMenu = document.getElementById('mobile-menu');
 const hamburger = document.getElementById('hamburger');
 const toastEl = document.getElementById('toast');
 const body = document.querySelector("body");
 const bg_mb = document.querySelector(".allback");
-const searchInput = document.getElementById('searchInput');
-const noResults = document.getElementById('noResults');
 const downloadBtn = document.getElementById('downloadPdfBtn');
+
+const categoriesGrid = document.getElementById('categoriesGrid');
+const topicsContainer = document.getElementById('topicsContainer');
+const topicsGrid = document.getElementById('topicsGrid');
+const selectedCategoryTitle = document.getElementById('selectedCategoryTitle');
+const noResults = document.getElementById('noResults');
+const categorySearchInput = document.getElementById('categorySearchInput');
+const topicSearchInput = document.getElementById('topicSearchInput');
+const globalSearchContainer = document.getElementById('globalSearchContainer');
+const categorySearchContainer = document.getElementById('categorySearchContainer');
 
 // ─── ===== شروع برنامه ===== ───
 (function init() {
-    if (topicsGrid) {
-        renderTopics(topicsData);
-    }
+    allTopicsData = topicsData;
+
+    renderCategories(allTopicsData);
 
     window.addEventListener('hashchange', handleRoute);
 
     handleRoute();
     initParticles();
 
-    if (searchInput) {
-        searchInput.addEventListener('input', window.searchTopics);
-        searchInput.addEventListener('keyup', function(e) {
+    if (downloadBtn) {
+        downloadBtn.style.display = 'none';
+    }
+
+    if (categorySearchInput) {
+        categorySearchInput.addEventListener('input', function(e) {
+            window.searchAllTopics();
+        });
+        categorySearchInput.addEventListener('keyup', function(e) {
             if (e.key === 'Enter') {
-                window.searchTopics();
+                window.searchAllTopics();
             }
         });
     }
 
-    if (downloadBtn) {
-        downloadBtn.style.display = 'none';
+    if (topicSearchInput) {
+        topicSearchInput.addEventListener('input', function(e) {
+            window.searchTopicsInCategory();
+        });
+        topicSearchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                window.searchTopicsInCategory();
+            }
+        });
     }
 })();
 
-// ─── ===== نمایش کارت‌های موضوعات ===== ───
-function renderTopics(data) {
-    if (!data || !data.length) {
-        if (topicsGrid) {
-            topicsGrid.innerHTML = '';
+// ─── ===== دریافت دسته‌بندی‌های منحصر به فرد ===== ───
+function getUniqueCategories(data) {
+    const categories = [];
+    for (var i = 0; i < data.length; i++) {
+        if (!categories.includes(data[i].category)) {
+            categories.push(data[i].category);
         }
-        if (noResults) {
-            noResults.classList.add('show');
+    }
+    return categories;
+}
+
+// ─── ===== دریافت آیکون هر دسته‌بندی ===== ───
+function getCategoryIcon(category) {
+    var iconMap = {
+        'تاریخ ایران': '🏛️',
+        'دانشمندان': '🔬',
+        'مخترعان': '💡',
+        'کارآفرینان و فناوری': '🚀',
+        'رهبران و فعالان': '✊',
+        'فرمانروایان و ژنرال‌ها': '⚔️',
+        'فرمانروایان و ملکه‌ها': '👑',
+        'هنرمندان': '🎨',
+        'شاعران و ادیبان': '📜'
+    };
+    return iconMap[category] || '📁';
+}
+
+// ─── ===== رندر دسته‌بندی‌ها (کارت‌ها) ===== ───
+function renderCategories(data) {
+    var categories = getUniqueCategories(data);
+
+    if (categories.length === 0) {
+        categoriesGrid.innerHTML = `<div class="no-results show" style="grid-column:1/-1;">
+            <span>📂</span>
+            <p>هیچ دسته‌بندی یافت نشد.</p>
+        </div>`;
+        return;
+    }
+
+    var html = '';
+    for (var i = 0; i < categories.length; i++) {
+        var cat = categories[i];
+        var count = 0;
+        for (var j = 0; j < data.length; j++) {
+            if (data[j].category === cat) count++;
+        }
+
+        var icon = getCategoryIcon(cat);
+
+        html += `
+            <div class="glass-card category-card" onclick="window.selectCategory('${cat}')" tabindex="0"
+                 onkeydown="if(event.key==='Enter')window.selectCategory('${cat}')">
+                <span class="category-icon">${icon}</span>
+                <h3>${cat}</h3>
+                <span class="category-item-count">${count} موضوع</span>
+            </div>
+        `;
+    }
+    categoriesGrid.innerHTML = html;
+}
+
+// ─── ===== جستجوی عمومی در همه موضوعات ===== ───
+window.searchAllTopics = function() {
+    if (!categorySearchInput) return;
+
+    var query = categorySearchInput.value.trim().toLowerCase();
+
+    var oldResults = document.querySelector('.search-results-list');
+    if (oldResults) {
+        oldResults.remove();
+    }
+    var oldNoResults = document.querySelector('.search-no-results');
+    if (oldNoResults) {
+        oldNoResults.remove();
+    }
+
+    if (!query) {
+        categoriesGrid.style.display = 'grid';
+        topicsContainer.style.display = 'none';
+        if (globalSearchContainer) {
+            globalSearchContainer.style.display = 'flex';
+        }
+        if (categorySearchContainer) {
+            categorySearchContainer.style.display = 'none';
+        }
+        if (topicSearchInput) {
+            topicSearchInput.value = '';
+        }
+        noResults.classList.remove('show');
+        renderCategories(allTopicsData);
+        return;
+    }
+
+    var filtered = [];
+    for (var i = 0; i < allTopicsData.length; i++) {
+        var topic = allTopicsData[i];
+        if (topic.title.toLowerCase().includes(query) ||
+            topic.category.toLowerCase().includes(query) ||
+            topic.summary.toLowerCase().includes(query)) {
+            filtered.push(topic);
+        }
+    }
+
+    categoriesGrid.style.display = 'none';
+    topicsContainer.style.display = 'none';
+    if (globalSearchContainer) {
+        globalSearchContainer.style.display = 'flex';
+    }
+    if (categorySearchContainer) {
+        categorySearchContainer.style.display = 'none';
+    }
+
+    var resultsDiv = document.createElement('div');
+    resultsDiv.className = 'search-results-list';
+    resultsDiv.style.cssText = `
+        margin: 20px 0 30px;
+        padding: 20px;
+        background: var(--glass-bg);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+    `;
+
+    if (filtered.length === 0) {
+        resultsDiv.innerHTML = `
+            <div class="search-no-results" style="text-align:center;padding:40px 20px;color:var(--text-muted);">
+                <span style="font-size:2.5rem;display:block;margin-bottom:12px;"><img width="50px" src="assets/icon/Search.png" alt=""></span>
+                <p style="font-size:1.05rem;">هیچ موضوعی با جستجوی شما یافت نشد.</p>
+            </div>
+        `;
+        var oldResults2 = document.querySelector('.search-results-list');
+        if (oldResults2) oldResults2.remove();
+
+        var searchContainer = document.querySelector('.category-search-container');
+        if (searchContainer) {
+            searchContainer.parentNode.insertBefore(resultsDiv, searchContainer.nextSibling);
         }
         return;
     }
 
-    if (noResults) {
-        noResults.classList.remove('show');
+    var html = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--border);">
+            <h3 style="font-size:1.1rem;font-weight:700;color:var(--primary);">نتایج جستجو</h3>
+            <span style="font-size:0.85rem;color:var(--text-muted);background:var(--surface);padding:2px 14px;border-radius:20px;">${filtered.length} مورد</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">
+    `;
+
+    for (var j = 0; j < filtered.length; j++) {
+        var t = filtered[j];
+        html += `
+            <div class="glass-card topic-card" onclick="window.openTopic('${t.id}')" tabindex="0"
+                 onkeydown="if(event.key==='Enter')window.openTopic('${t.id}')" style="cursor:pointer;">
+                <span class="topic-tag">${t.category}</span>
+                <h3 style="font-size:1.1rem;font-weight:700;line-height:1.4;color:var(--text);">${t.title}</h3>
+                <p style="color:var(--text-muted);font-size:0.9rem;flex:1;">${t.summary}</p>
+                <div class="topic-footer" style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;border-top:1px solid var(--border);padding-top:10px;">
+                    <span class="topic-meta" style="font-size:0.75rem;color:var(--text-muted);display:flex;align-items:end;"> ${t.date} &nbsp;·&nbsp;<img width="17px" src="assets/icon/Calendar.png" alt=""></span>
+                </div>
+            </div>
+        `;
     }
 
+    html += `</div>`;
+    resultsDiv.innerHTML = html;
+
+    var oldResults3 = document.querySelector('.search-results-list');
+    if (oldResults3) oldResults3.remove();
+
+    var searchContainer2 = document.querySelector('.category-search-container');
+    if (searchContainer2) {
+        searchContainer2.parentNode.insertBefore(resultsDiv, searchContainer2.nextSibling);
+    }
+};
+
+// ─── ===== انتخاب دسته‌بندی ===== ───
+window.selectCategory = function(category) {
+    selectedCategory = category;
+
+    var oldResults = document.querySelector('.search-results-list');
+    if (oldResults) oldResults.remove();
+
+    categoriesGrid.style.display = 'none';
+    topicsContainer.style.display = 'block';
+
+    if (globalSearchContainer) {
+        globalSearchContainer.style.display = 'none';
+    }
+    if (categorySearchContainer) {
+        categorySearchContainer.style.display = 'flex';
+    }
+
+    selectedCategoryTitle.textContent = category;
+
+    if (categorySearchInput) {
+        categorySearchInput.value = '';
+    }
+
+    if (topicSearchInput) {
+        topicSearchInput.value = '';
+    }
+
+    renderTopicsByCategory(category);
+};
+
+// ─── ===== نمایش دوباره دسته‌بندی‌ها ===== ───
+window.showCategories = function() {
+    var oldResults = document.querySelector('.search-results-list');
+    if (oldResults) oldResults.remove();
+
+    selectedCategory = '';
+    topicsContainer.style.display = 'none';
+    categoriesGrid.style.display = 'grid';
+
+    if (globalSearchContainer) {
+        globalSearchContainer.style.display = 'flex';
+    }
+    if (categorySearchContainer) {
+        categorySearchContainer.style.display = 'none';
+    }
+
+    if (topicSearchInput) {
+        topicSearchInput.value = '';
+    }
+
+    if (categorySearchInput) {
+        categorySearchInput.value = '';
+    }
+
+    noResults.classList.remove('show');
+    renderCategories(allTopicsData);
+};
+
+// ─── ===== رندر موضوعات بر اساس دسته‌بندی ===== ───
+function renderTopicsByCategory(category) {
+    var items = [];
+    for (var i = 0; i < allTopicsData.length; i++) {
+        if (allTopicsData[i].category === category) {
+            items.push(allTopicsData[i]);
+        }
+    }
+
+    if (items.length === 0) {
+        topicsGrid.innerHTML = '';
+        noResults.classList.add('show');
+        noResults.querySelector('p').textContent = 'هیچ موضوعی در این دسته‌بندی یافت نشد.';
+        return;
+    }
+
+    noResults.classList.remove('show');
+
     var html = '';
-    for (var i = 0; i < data.length; i++) {
-        var t = data[i];
+    for (var j = 0; j < items.length; j++) {
+        var t = items[j];
         html += `
             <div class="glass-card topic-card" onclick="window.openTopic('${t.id}')" tabindex="0"
                  onkeydown="if(event.key==='Enter')window.openTopic('${t.id}')">
@@ -83,24 +339,57 @@ function renderTopics(data) {
     topicsGrid.innerHTML = html;
 }
 
-// ─── ===== تابع جستجو ===== ───
-window.searchTopics = function() {
-    if (!searchInput) return;
+// ─── ===== جستجوی موضوعات داخل دسته ===== ───
+window.searchTopicsInCategory = function() {
+    if (!topicSearchInput || !selectedCategory) return;
 
-    var query = searchInput.value.trim().toLowerCase();
+    var query = topicSearchInput.value.trim().toLowerCase();
+
+    var items = [];
+    for (var i = 0; i < allTopicsData.length; i++) {
+        if (allTopicsData[i].category === selectedCategory) {
+            items.push(allTopicsData[i]);
+        }
+    }
 
     if (!query) {
-        renderTopics(topicsData);
+        renderTopicsByCategory(selectedCategory);
         return;
     }
 
-    var filtered = topicsData.filter(function(topic) {
-        return topic.title.toLowerCase().includes(query) ||
-            topic.category.toLowerCase().includes(query) ||
-            topic.summary.toLowerCase().includes(query);
-    });
+    var filtered = [];
+    for (var j = 0; j < items.length; j++) {
+        if (items[j].title.toLowerCase().includes(query) ||
+            items[j].summary.toLowerCase().includes(query)) {
+            filtered.push(items[j]);
+        }
+    }
 
-    renderTopics(filtered);
+    if (filtered.length === 0) {
+        topicsGrid.innerHTML = '';
+        noResults.classList.add('show');
+        noResults.querySelector('p').textContent = 'هیچ موضوعی با جستجوی شما در این دسته یافت نشد.';
+        return;
+    }
+
+    noResults.classList.remove('show');
+
+    var html = '';
+    for (var k = 0; k < filtered.length; k++) {
+        var t = filtered[k];
+        html += `
+            <div class="glass-card topic-card" onclick="window.openTopic('${t.id}')" tabindex="0"
+                 onkeydown="if(event.key==='Enter')window.openTopic('${t.id}')">
+                <span class="topic-tag">${t.category}</span>
+                <h3>${t.title}</h3>
+                <p>${t.summary}</p>
+                <div class="topic-footer">
+                    <span class="topic-meta"> ${t.date} &nbsp;·&nbsp;<img width="17px" src="assets/icon/Calendar.png" alt=""></span>
+                </div>
+            </div>
+        `;
+    }
+    topicsGrid.innerHTML = html;
 };
 
 // ─── ===== اسکرول به بالا ===== ───
@@ -146,10 +435,27 @@ function navigate(pageName, pushState, extraData) {
         document.title = siteName;
     } else if (pageName === 'topics') {
         document.title = 'موضوعات | ' + siteName;
-        if (searchInput) {
-            searchInput.value = '';
-            renderTopics(topicsData);
+        var oldResults = document.querySelector('.search-results-list');
+        if (oldResults) oldResults.remove();
+
+        categoriesGrid.style.display = 'grid';
+        topicsContainer.style.display = 'none';
+
+        if (globalSearchContainer) {
+            globalSearchContainer.style.display = 'flex';
         }
+        if (categorySearchContainer) {
+            categorySearchContainer.style.display = 'none';
+        }
+
+        if (categorySearchInput) {
+            categorySearchInput.value = '';
+        }
+        if (topicSearchInput) {
+            topicSearchInput.value = '';
+        }
+        noResults.classList.remove('show');
+        renderCategories(allTopicsData);
         if (downloadBtn) {
             downloadBtn.style.display = 'none';
         }
@@ -432,6 +738,10 @@ window.toggleMenu = toggleMenu;
 window.closeMenu = closeMenu;
 window.showToast = showToast;
 window.downloadArticlePdf = downloadArticlePdf;
+window.selectCategory = selectCategory;
+window.showCategories = showCategories;
+window.searchAllTopics = searchAllTopics;
+window.searchTopicsInCategory = searchTopicsInCategory;
 
 // ─── ===== ذرات پس‌زمینه (Particles) ===== ───
 function initParticles() {

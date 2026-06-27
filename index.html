@@ -60,9 +60,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
-</script>
+    </script>
+
     <!-- ===== MAIN JS ===== -->
     <script type="module" defer src="assets/src/main.js"></script>
 </head>
@@ -212,13 +211,14 @@
                 <div class="section-eyebrow">کتابخانه محتوا</div>
                 <h2 class="section-title">همه موضوعات</h2>
                 <div class="glow-divider"></div>
-                <p class="section-desc">موضوع مورد نظر خود را انتخاب کنید تا مقاله کامل را بخوانید.</p>
+                <p class="section-desc">دسته‌بندی موضوعات را انتخاب کنید.</p>
             </div>
 
-            <div class="search-container">
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="جستجوی موضوعات ..." />
-                    <button class="search-icon" id="searchBtn" onclick="window.searchTopics()" aria-label="جستجو">
+            <!-- ===== سرچ باکس عمومی (همه موضوعات) ===== -->
+            <div class="category-search-container" id="globalSearchContainer">
+                <div class="category-search-box-main">
+                    <input type="text" id="categorySearchInput" placeholder="جستجو در همه موضوعات ..." />
+                    <button class="category-search-icon-main" onclick="window.searchAllTopics()" aria-label="جستجو">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                             stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="11" cy="11" r="8" />
@@ -228,21 +228,46 @@
                 </div>
             </div>
 
-            <div class="topics-grid" id="topics-grid">
-                <div class="glass-card" style="height:220px;">
-                    <div class="skeleton" style="height:100%;border-radius:12px;"></div>
-                </div>
-                <div class="glass-card" style="height:220px;">
-                    <div class="skeleton" style="height:100%;border-radius:12px;"></div>
-                </div>
-                <div class="glass-card" style="height:220px;">
-                    <div class="skeleton" style="height:100%;border-radius:12px;"></div>
-                </div>
+            <!-- ===== دسته‌بندی‌ها (کارت‌ها) ===== -->
+            <div class="categories-grid" id="categoriesGrid">
+                <!-- توسط جاوااسکریپت ساخته می‌شود -->
             </div>
 
-            <div class="no-results" id="noResults">
-                <span><img width="50px" src="assets/icon/Search.png" alt=""></span>
-                <p>هیچ موضوعی با جستجوی شما یافت نشد.</p>
+            <!-- ===== کانتینر موضوعات (مخفی در ابتدا) ===== -->
+            <div class="topics-container" id="topicsContainer" style="display: none;">
+                <div class="category-header-back">
+                    <button class="back-to-categories" onclick="window.showCategories()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6" />
+                        </svg>
+                        بازگشت به دسته‌بندی‌ها
+                    </button>
+                    <h2 class="selected-category-title" id="selectedCategoryTitle"></h2>
+                </div>
+
+                <!-- ===== سرچ باکس اختصاصی داخل دسته ===== -->
+                <div class="topic-search-container" id="categorySearchContainer">
+                    <div class="topic-search-box">
+                        <input type="text" id="topicSearchInput" placeholder="جستجو در این دسته ..." />
+                        <button class="topic-search-icon" onclick="window.searchTopicsInCategory()" aria-label="جستجو">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="topics-grid" id="topicsGrid">
+                    <!-- موضوعات توسط جاوااسکریپت ساخته می‌شود -->
+                </div>
+
+                <div class="no-results" id="noResults">
+                    <span><img width="50px" src="assets/icon/Search.png" alt=""></span>
+                    <p>هیچ موضوعی یافت نشد.</p>
+                </div>
             </div>
 
             <footer>
