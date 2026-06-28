@@ -5,12 +5,49 @@
 // ─── ===== وارد کردن داده‌ها ===== ───
 import { topicsData } from '../json/data.js';
 
+// ─── ===== دسته‌بندی‌های مجاز ===== ───
+const ALLOWED_CATEGORIES = [
+    'فرمانروایان و ژنرال‌ ها',
+    'دانشمندان',
+    'مخترعان',
+    'کارآفرینان و فناوری',
+    'رهبران و فعالان',
+    'ملکه ها',
+    'هنرمندان',
+    'شاعران و ادیبان'
+];
+
+// ─── ===== فیلتر کردن داده‌ها و دسته‌بندی "سایر" ===== ───
+function processData(data) {
+    var allowed = [];
+    var other = [];
+
+    for (var i = 0; i < data.length; i++) {
+        var topic = data[i];
+        if (ALLOWED_CATEGORIES.includes(topic.category)) {
+            allowed.push(topic);
+        } else {
+            var newTopic = Object.assign({}, topic);
+            newTopic.category = 'سایر';
+            newTopic.originalCategory = topic.category;
+            other.push(newTopic);
+        }
+    }
+
+    return allowed.concat(other);
+}
+
 // ─── ===== متغیرهای وضعیت ===== ───
 let currentPage = '';
 let currentTopicTitle = '';
 let currentTopicId = '';
 let selectedCategory = '';
+let lastSelectedCategory = '';
 let allTopicsData = [];
+let currentView = 'all'; // تغییر: پیش‌فرض روی 'all' (همه موضوعات)
+let shouldPreventScroll = false;
+let isReturningFromArticle = false;
+let articleSourceView = '';
 
 // ─── ===== گرفتن المان‌های DOM ===== ───
 const pageHome = document.getElementById('page-home');
@@ -26,6 +63,7 @@ const downloadBtn = document.getElementById('downloadPdfBtn');
 const categoriesGrid = document.getElementById('categoriesGrid');
 const topicsContainer = document.getElementById('topicsContainer');
 const topicsGrid = document.getElementById('topicsGrid');
+const topicsAllGrid = document.getElementById('topicsAllGrid');
 const selectedCategoryTitle = document.getElementById('selectedCategoryTitle');
 const noResults = document.getElementById('noResults');
 const categorySearchInput = document.getElementById('categorySearchInput');
@@ -34,12 +72,21 @@ const globalSearchContainer = document.getElementById('globalSearchContainer');
 const categorySearchContainer = document.getElementById('categorySearchContainer');
 const clearGlobalSearchBtn = document.getElementById('clearGlobalSearch');
 const clearCategorySearchBtn = document.getElementById('clearCategorySearch');
+const viewCategoriesBtn = document.getElementById('viewCategoriesBtn');
+const viewAllTopicsBtn = document.getElementById('viewAllTopicsBtn');
 
 // ─── ===== شروع برنامه ===== ───
 (function init() {
-    allTopicsData = topicsData;
+    allTopicsData = processData(topicsData);
 
     renderCategories(allTopicsData);
+    renderAllTopics(allTopicsData);
+    
+    // ===== نمایش همه موضوعات در ابتدا =====
+    categoriesGrid.style.display = 'none';
+    topicsAllGrid.style.display = 'grid';
+    viewCategoriesBtn.classList.remove('active');
+    viewAllTopicsBtn.classList.add('active');
 
     window.addEventListener('hashchange', handleRoute);
 
@@ -74,6 +121,80 @@ const clearCategorySearchBtn = document.getElementById('clearCategorySearch');
         });
     }
 })();
+
+// ─── ===== سوئیچ بین حالت‌ها ===== ───
+window.switchView = function(view) {
+    currentView = view;
+
+    viewCategoriesBtn.classList.toggle('active', view === 'categories');
+    viewAllTopicsBtn.classList.toggle('active', view === 'all');
+
+    if (view === 'categories') {
+        categoriesGrid.style.display = 'grid';
+        topicsAllGrid.style.display = 'none';
+        topicsContainer.style.display = 'none';
+        globalSearchContainer.style.display = 'flex';
+        categorySearchContainer.style.display = 'none';
+        
+        if (categorySearchInput) {
+            categorySearchInput.value = '';
+        }
+        renderCategories(allTopicsData);
+    } else {
+        categoriesGrid.style.display = 'none';
+        topicsAllGrid.style.display = 'grid';
+        topicsContainer.style.display = 'none';
+        globalSearchContainer.style.display = 'flex';
+        categorySearchContainer.style.display = 'none';
+        
+        if (categorySearchInput) {
+            categorySearchInput.value = '';
+        }
+        renderAllTopics(allTopicsData);
+    }
+    
+    var oldResults = document.querySelector('.search-results-list');
+    if (oldResults) oldResults.remove();
+    noResults.classList.remove('show');
+    
+    shouldPreventScroll = false;
+    scrollToTop();
+};
+
+// ─── ===== رندر همه موضوعات ===== ───
+function renderAllTopics(data) {
+    if (!topicsAllGrid) return;
+
+    if (!data || !data.length) {
+        topicsAllGrid.innerHTML = `
+            <div class="no-results show" style="grid-column:1/-1;">
+                <span>📂</span>
+                <p>هیچ موضوعی یافت نشد.</p>
+            </div>
+        `;
+        return;
+    }
+
+    var html = '';
+    for (var i = 0; i < data.length; i++) {
+        var t = data[i];
+
+        html += `
+            <div class="glass-card topic-card" onclick="window.openTopic('${t.id}')" tabindex="0"
+                 onkeydown="if(event.key==='Enter')window.openTopic('${t.id}')">
+                <div class="topic-tag-wrapper">
+                    <span class="topic-tag">${t.category}</span>
+                </div>
+                <h3>${t.title}</h3>
+                <p>${t.summary}</p>
+                <div class="topic-footer">
+                    <span class="topic-meta"> ${t.date} &nbsp;·&nbsp;<img width="17px" src="assets/icon/Calendar.png" alt=""></span>
+                </div>
+            </div>
+        `;
+    }
+    topicsAllGrid.innerHTML = html;
+}
 
 // ─── ===== نمایش/مخفی کردن دکمه پاک کردن ===== ───
 function toggleClearButton(type) {
@@ -138,16 +259,95 @@ function getUniqueCategories(data) {
 // ─── ===== دریافت آیکون هر دسته‌بندی ===== ───
 function getCategoryIcon(category) {
     var iconMap = {
-        'پادشاه': '👑',
+        'فرمانروایان و ژنرال‌ ها': '⚔️',
         'دانشمندان': '🔬',
         'مخترعان': '💡',
         'کارآفرینان و فناوری': '🚀',
         'رهبران و فعالان': '✊',
-        'فرمانروایان و ژنرال‌ها': '⚔️',
+        'ملکه ها': '👑',
         'هنرمندان': '🎨',
         'شاعران و ادیبان': '📜'
     };
     return iconMap[category] || '📁';
+}
+
+// ─── ===== دریافت استیکر هر موضوع ===== ───
+function getTopicSticker(topic) {
+    var stickerMap = {
+        'albert-einstein': 'genius',
+        'nikola-tesla': 'genius',
+        'leonardo-da-vinci': 'genius',
+        'marie-curie': 'genius',
+        'ibn-sina': 'genius',
+        'ferdowsi': 'poet',
+        'cyrus-the-great': 'emperor',
+        'napoleon-bonaparte': 'emperor',
+        'alexander-the-great': 'emperor',
+        'cleopatra': 'queen'
+    };
+
+    if (topic.category === 'سایر') {
+        return 'other';
+    }
+
+    return stickerMap[topic.id] || null;
+}
+
+// ─── ===== تولید HTML استیکر ===== ───
+function getStickerHtml(stickerType) {
+    if (stickerType === 'genius') {
+        return `
+            <span class="genius-sticker">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                نابغه
+            </span>
+        `;
+    } else if (stickerType === 'poet') {
+        return `
+            <span class="poet-sticker">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                    <path d="M2 17l10 5 10-5" />
+                    <path d="M2 12l10 5 10-5" />
+                </svg>
+                شاعر
+            </span>
+        `;
+    } else if (stickerType === 'emperor') {
+        return `
+            <span class="emperor-sticker">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L9 8h6L12 2z" />
+                    <path d="M8 8l-4 12h16L16 8" />
+                    <circle cx="12" cy="16" r="2" />
+                </svg>
+                امپراتور
+            </span>
+        `;
+    } else if (stickerType === 'queen') {
+        return `
+            <span class="queen-sticker">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L9 8h6L12 2z" />
+                    <path d="M8 8l-4 12h16L16 8" />
+                    <circle cx="12" cy="16" r="2" />
+                </svg>
+                ملکه
+            </span>
+        `;
+    } else if (stickerType === 'other') {
+        return `
+            <span class="other-sticker">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                </svg>
+                سایر
+            </span>
+        `;
+    }
+    return '';
 }
 
 // ─── ===== رندر دسته‌بندی‌ها (کارت‌ها) ===== ───
@@ -200,20 +400,23 @@ window.searchAllTopics = function() {
     }
 
     if (!query) {
-        categoriesGrid.style.display = 'grid';
-        topicsContainer.style.display = 'none';
-        if (globalSearchContainer) {
-            globalSearchContainer.style.display = 'flex';
-        }
-        if (categorySearchContainer) {
-            categorySearchContainer.style.display = 'none';
+        if (currentView === 'categories') {
+            categoriesGrid.style.display = 'grid';
+            topicsAllGrid.style.display = 'none';
+            topicsContainer.style.display = 'none';
+            noResults.classList.remove('show');
+            renderCategories(allTopicsData);
+        } else {
+            categoriesGrid.style.display = 'none';
+            topicsAllGrid.style.display = 'grid';
+            topicsContainer.style.display = 'none';
+            noResults.classList.remove('show');
+            renderAllTopics(allTopicsData);
         }
         if (topicSearchInput) {
             topicSearchInput.value = '';
         }
-        noResults.classList.remove('show');
         toggleClearButton('category');
-        renderCategories(allTopicsData);
         return;
     }
 
@@ -228,13 +431,10 @@ window.searchAllTopics = function() {
     }
 
     categoriesGrid.style.display = 'none';
+    topicsAllGrid.style.display = 'none';
     topicsContainer.style.display = 'none';
-    if (globalSearchContainer) {
-        globalSearchContainer.style.display = 'flex';
-    }
-    if (categorySearchContainer) {
-        categorySearchContainer.style.display = 'none';
-    }
+    globalSearchContainer.style.display = 'flex';
+    categorySearchContainer.style.display = 'none';
 
     var resultsDiv = document.createElement('div');
     resultsDiv.className = 'search-results-list';
@@ -273,10 +473,14 @@ window.searchAllTopics = function() {
 
     for (var j = 0; j < filtered.length; j++) {
         var t = filtered[j];
+        var stickerType = getTopicSticker(t);
+
         html += `
             <div class="glass-card topic-card" onclick="window.openTopic('${t.id}')" tabindex="0"
                  onkeydown="if(event.key==='Enter')window.openTopic('${t.id}')" style="cursor:pointer;">
-                <span class="topic-tag">${t.category}</span>
+                <div class="topic-tag-wrapper">
+                    <span class="topic-tag">${t.category}</span>
+                </div>
                 <h3 style="font-size:1.1rem;font-weight:700;line-height:1.4;color:var(--text);">${t.title}</h3>
                 <p style="color:var(--text-muted);font-size:0.9rem;flex:1;">${t.summary}</p>
                 <div class="topic-footer" style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;border-top:1px solid var(--border);padding-top:10px;">
@@ -301,12 +505,22 @@ window.searchAllTopics = function() {
 // ─── ===== انتخاب دسته‌بندی ===== ───
 window.selectCategory = function(category) {
     selectedCategory = category;
+    lastSelectedCategory = category;
 
     var oldResults = document.querySelector('.search-results-list');
     if (oldResults) oldResults.remove();
 
+    if (currentView === 'all') {
+        currentView = 'categories';
+        viewCategoriesBtn.classList.add('active');
+        viewAllTopicsBtn.classList.remove('active');
+        categoriesGrid.style.display = 'grid';
+        topicsAllGrid.style.display = 'none';
+    }
+
     categoriesGrid.style.display = 'none';
     topicsContainer.style.display = 'block';
+    topicsAllGrid.style.display = 'none';
 
     if (globalSearchContainer) {
         globalSearchContainer.style.display = 'none';
@@ -329,16 +543,33 @@ window.selectCategory = function(category) {
     toggleClearButton('category');
 
     renderTopicsByCategory(category);
+    
+    shouldPreventScroll = false;
+    isReturningFromArticle = false;
+    
+    setTimeout(function() {
+        scrollToTop();
+    }, 100);
 };
 
-// ─── ===== نمایش دوباره دسته‌بندی‌ها ===== ───
+// ─── ===== نمایش دوباره دسته‌بندی‌ها (بازگشت از داخل دسته) ===== ───
 window.showCategories = function() {
     var oldResults = document.querySelector('.search-results-list');
     if (oldResults) oldResults.remove();
 
     selectedCategory = '';
     topicsContainer.style.display = 'none';
-    categoriesGrid.style.display = 'grid';
+    
+    shouldPreventScroll = true;
+    isReturningFromArticle = false;
+    
+    if (currentView === 'all') {
+        categoriesGrid.style.display = 'none';
+        topicsAllGrid.style.display = 'grid';
+    } else {
+        categoriesGrid.style.display = 'grid';
+        topicsAllGrid.style.display = 'none';
+    }
 
     if (globalSearchContainer) {
         globalSearchContainer.style.display = 'flex';
@@ -359,7 +590,11 @@ window.showCategories = function() {
     toggleClearButton('category');
 
     noResults.classList.remove('show');
-    renderCategories(allTopicsData);
+    if (currentView === 'all') {
+        renderAllTopics(allTopicsData);
+    } else {
+        renderCategories(allTopicsData);
+    }
 };
 
 // ─── ===== رندر موضوعات بر اساس دسته‌بندی ===== ───
@@ -383,10 +618,14 @@ function renderTopicsByCategory(category) {
     var html = '';
     for (var j = 0; j < items.length; j++) {
         var t = items[j];
+        var stickerType = getTopicSticker(t);
+
         html += `
             <div class="glass-card topic-card" onclick="window.openTopic('${t.id}')" tabindex="0"
                  onkeydown="if(event.key==='Enter')window.openTopic('${t.id}')">
-                <span class="topic-tag">${t.category}</span>
+                <div class="topic-tag-wrapper">
+                    <span class="topic-tag">${t.category}</span>
+                </div>
                 <h3>${t.title}</h3>
                 <p>${t.summary}</p>
                 <div class="topic-footer">
@@ -436,10 +675,16 @@ window.searchTopicsInCategory = function() {
     var html = '';
     for (var k = 0; k < filtered.length; k++) {
         var t = filtered[k];
+        var stickerType = getTopicSticker(t);
+        var stickerHtml = getStickerHtml(stickerType);
+
         html += `
             <div class="glass-card topic-card" onclick="window.openTopic('${t.id}')" tabindex="0"
                  onkeydown="if(event.key==='Enter')window.openTopic('${t.id}')">
-                <span class="topic-tag">${t.category}</span>
+                <div class="topic-tag-wrapper">
+                    <span class="topic-tag">${t.category}</span>
+                    ${stickerHtml}
+                </div>
                 <h3>${t.title}</h3>
                 <p>${t.summary}</p>
                 <div class="topic-footer">
@@ -453,6 +698,11 @@ window.searchTopicsInCategory = function() {
 
 // ─── ===== اسکرول به بالا ===== ───
 function scrollToTop() {
+    if (shouldPreventScroll) {
+        shouldPreventScroll = false;
+        return;
+    }
+    
     window.scrollTo({
         top: 0,
         left: 0,
@@ -475,7 +725,43 @@ function navigate(pageName, pushState, extraData) {
         target.classList.add('active');
     }
 
-    scrollToTop();
+    if (pageName === 'topics') {
+        if (isReturningFromArticle) {
+            isReturningFromArticle = false;
+            
+            if (articleSourceView === 'all') {
+                currentView = 'all';
+                viewCategoriesBtn.classList.remove('active');
+                viewAllTopicsBtn.classList.add('active');
+                categoriesGrid.style.display = 'none';
+                topicsAllGrid.style.display = 'grid';
+                topicsContainer.style.display = 'none';
+                renderAllTopics(allTopicsData);
+                shouldPreventScroll = true;
+            } 
+            else if (articleSourceView === 'categories' && lastSelectedCategory) {
+                setTimeout(function() {
+                    window.selectCategory(lastSelectedCategory);
+                }, 50);
+                shouldPreventScroll = true;
+            }
+            else {
+                if (!shouldPreventScroll) {
+                    scrollToTop();
+                } else {
+                    shouldPreventScroll = false;
+                }
+            }
+        } else {
+            if (!shouldPreventScroll) {
+                scrollToTop();
+            } else {
+                shouldPreventScroll = false;
+            }
+        }
+    } else {
+        scrollToTop();
+    }
 
     var navLinks = document.querySelectorAll('.nav-links a');
     for (var j = 0; j < navLinks.length; j++) {
@@ -494,32 +780,53 @@ function navigate(pageName, pushState, extraData) {
         document.title = siteName;
     } else if (pageName === 'topics') {
         document.title = 'موضوعات | ' + siteName;
-        var oldResults = document.querySelector('.search-results-list');
-        if (oldResults) oldResults.remove();
+        
+        if (!isReturningFromArticle) {
+            var oldResults = document.querySelector('.search-results-list');
+            if (oldResults) oldResults.remove();
 
-        categoriesGrid.style.display = 'grid';
-        topicsContainer.style.display = 'none';
+            if (currentView === 'all') {
+                categoriesGrid.style.display = 'none';
+                topicsAllGrid.style.display = 'grid';
+                topicsContainer.style.display = 'none';
+                viewCategoriesBtn.classList.remove('active');
+                viewAllTopicsBtn.classList.add('active');
+            } else {
+                categoriesGrid.style.display = 'grid';
+                topicsAllGrid.style.display = 'none';
+                topicsContainer.style.display = 'none';
+                viewCategoriesBtn.classList.add('active');
+                viewAllTopicsBtn.classList.remove('active');
+            }
 
-        if (globalSearchContainer) {
-            globalSearchContainer.style.display = 'flex';
-        }
-        if (categorySearchContainer) {
-            categorySearchContainer.style.display = 'none';
-        }
+            if (globalSearchContainer) {
+                globalSearchContainer.style.display = 'flex';
+            }
+            if (categorySearchContainer) {
+                categorySearchContainer.style.display = 'none';
+            }
 
-        if (categorySearchInput) {
-            categorySearchInput.value = '';
+            if (categorySearchInput) {
+                categorySearchInput.value = '';
+            }
+            if (topicSearchInput) {
+                topicSearchInput.value = '';
+            }
+            toggleClearButton('global');
+            toggleClearButton('category');
+            noResults.classList.remove('show');
+            
+            if (currentView === 'all') {
+                renderAllTopics(allTopicsData);
+            } else {
+                renderCategories(allTopicsData);
+            }
         }
-        if (topicSearchInput) {
-            topicSearchInput.value = '';
-        }
-        toggleClearButton('global');
-        toggleClearButton('category');
-        noResults.classList.remove('show');
-        renderCategories(allTopicsData);
+        
         if (downloadBtn) {
             downloadBtn.style.display = 'none';
         }
+        
     } else if (pageName === 'article') {
         if (currentTopicTitle) {
             document.title = currentTopicTitle + ' | ' + siteName;
@@ -566,6 +873,14 @@ function openTopic(id) {
 
     if (!topic) return;
 
+    articleSourceView = currentView;
+    
+    if (selectedCategory) {
+        lastSelectedCategory = selectedCategory;
+    } else {
+        lastSelectedCategory = topic.category;
+    }
+    
     currentTopicTitle = topic.tab || topic.title;
     currentTopicId = topic.id;
 
@@ -579,6 +894,8 @@ function openTopic(id) {
     html += '<p>' + topic.body + '</p>';
     document.getElementById('article-body').innerHTML = html;
 
+    isReturningFromArticle = true;
+    
     navigate('article', true, id);
 
     setTimeout(scrollToTop, 50);
@@ -805,6 +1122,8 @@ window.searchAllTopics = searchAllTopics;
 window.searchTopicsInCategory = searchTopicsInCategory;
 window.clearGlobalSearch = clearGlobalSearch;
 window.clearCategorySearch = clearCategorySearch;
+window.switchView = switchView;
+window.renderAllTopics = renderAllTopics;
 
 // ─── ===== ذرات پس‌زمینه (Particles) ===== ───
 function initParticles() {
