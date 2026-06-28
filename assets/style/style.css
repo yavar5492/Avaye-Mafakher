@@ -492,11 +492,11 @@ nav {
   background: var(--search-bg);
   border: 1px solid var(--border);
   border-radius: 60px;
-  padding: 6px 6px 6px 20px;
+  padding: 6px 6px 6px 16px;
   width: 100%;
   max-width: 500px;
   transition: all 0.3s ease;
-  gap: 8px;
+  gap: 6px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -514,9 +514,10 @@ nav {
   color: var(--text);
   font-family: var(--font);
   font-size: 0.95rem;
-  border-radius: 9999px;
   padding: 10px !important;
   direction: rtl;
+  border-radius: 9999px;
+  min-width: 0;
 }
 
 .category-search-box-main input::placeholder {
@@ -547,6 +548,38 @@ nav {
 .category-search-box-main .category-search-icon-main svg {
   width: 20px;
   height: 20px;
+}
+
+/* ===== SEARCH CLEAR BUTTON ===== */
+.search-clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.search-clear-btn:hover {
+  background: var(--primary-dim);
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+.search-clear-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.search-clear-btn.show {
+  display: flex !important;
 }
 
 /* ===== CATEGORIES GRID ===== */
@@ -653,11 +686,11 @@ nav {
   background: var(--search-bg);
   border: 1px solid var(--border);
   border-radius: 60px;
-  padding: 6px 6px 6px 20px;
+  padding: 6px 6px 6px 16px;
   width: 100%;
   max-width: 450px;
   transition: all 0.3s ease;
-  gap: 8px;
+  gap: 6px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -676,8 +709,9 @@ nav {
   font-family: var(--font);
   font-size: 0.95rem;
   padding: 10px !important;
-  border-radius: 9999px;
   direction: rtl;
+  border-radius: 9999px;
+  min-width: 0;
 }
 
 .topic-search-box input::placeholder {
@@ -1268,12 +1302,12 @@ footer span {
   .category-search-box-main,
   .topic-search-box {
     max-width: 100%;
-    padding: 4px 4px 4px 16px;
+    padding: 4px 4px 4px 12px;
   }
   .category-search-box-main input,
   .topic-search-box input {
     font-size: 0.85rem;
-    padding: 8px 0;
+    padding: 8px !important;
   }
   .category-search-box-main .category-search-icon-main,
   .topic-search-box .topic-search-icon {
@@ -1284,6 +1318,14 @@ footer span {
   .topic-search-box .topic-search-icon svg {
     width: 17px;
     height: 17px;
+  }
+  .search-clear-btn {
+    width: 28px;
+    height: 28px;
+  }
+  .search-clear-btn svg {
+    width: 16px;
+    height: 16px;
   }
   .topics-grid {
     grid-template-columns: 1fr;

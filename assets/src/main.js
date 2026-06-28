@@ -32,6 +32,8 @@ const categorySearchInput = document.getElementById('categorySearchInput');
 const topicSearchInput = document.getElementById('topicSearchInput');
 const globalSearchContainer = document.getElementById('globalSearchContainer');
 const categorySearchContainer = document.getElementById('categorySearchContainer');
+const clearGlobalSearchBtn = document.getElementById('clearGlobalSearch');
+const clearCategorySearchBtn = document.getElementById('clearCategorySearch');
 
 // ─── ===== شروع برنامه ===== ───
 (function init() {
@@ -51,6 +53,7 @@ const categorySearchContainer = document.getElementById('categorySearchContainer
     if (categorySearchInput) {
         categorySearchInput.addEventListener('input', function(e) {
             window.searchAllTopics();
+            toggleClearButton('global');
         });
         categorySearchInput.addEventListener('keyup', function(e) {
             if (e.key === 'Enter') {
@@ -62,6 +65,7 @@ const categorySearchContainer = document.getElementById('categorySearchContainer
     if (topicSearchInput) {
         topicSearchInput.addEventListener('input', function(e) {
             window.searchTopicsInCategory();
+            toggleClearButton('category');
         });
         topicSearchInput.addEventListener('keyup', function(e) {
             if (e.key === 'Enter') {
@@ -70,6 +74,55 @@ const categorySearchContainer = document.getElementById('categorySearchContainer
         });
     }
 })();
+
+// ─── ===== نمایش/مخفی کردن دکمه پاک کردن ===== ───
+function toggleClearButton(type) {
+    if (type === 'global') {
+        if (clearGlobalSearchBtn) {
+            if (categorySearchInput && categorySearchInput.value.length > 0) {
+                clearGlobalSearchBtn.classList.add('show');
+                clearGlobalSearchBtn.style.display = 'flex';
+            } else {
+                clearGlobalSearchBtn.classList.remove('show');
+                clearGlobalSearchBtn.style.display = 'none';
+            }
+        }
+    } else if (type === 'category') {
+        if (clearCategorySearchBtn) {
+            if (topicSearchInput && topicSearchInput.value.length > 0) {
+                clearCategorySearchBtn.classList.add('show');
+                clearCategorySearchBtn.style.display = 'flex';
+            } else {
+                clearCategorySearchBtn.classList.remove('show');
+                clearCategorySearchBtn.style.display = 'none';
+            }
+        }
+    }
+}
+
+// ─── ===== پاک کردن سرچ عمومی ===== ───
+window.clearGlobalSearch = function() {
+    if (!categorySearchInput) return;
+    categorySearchInput.value = '';
+    if (clearGlobalSearchBtn) {
+        clearGlobalSearchBtn.classList.remove('show');
+        clearGlobalSearchBtn.style.display = 'none';
+    }
+    window.searchAllTopics();
+    categorySearchInput.focus();
+};
+
+// ─── ===== پاک کردن سرچ اختصاصی ===== ───
+window.clearCategorySearch = function() {
+    if (!topicSearchInput) return;
+    topicSearchInput.value = '';
+    if (clearCategorySearchBtn) {
+        clearCategorySearchBtn.classList.remove('show');
+        clearCategorySearchBtn.style.display = 'none';
+    }
+    window.searchTopicsInCategory();
+    topicSearchInput.focus();
+};
 
 // ─── ===== دریافت دسته‌بندی‌های منحصر به فرد ===== ───
 function getUniqueCategories(data) {
@@ -85,13 +138,12 @@ function getUniqueCategories(data) {
 // ─── ===== دریافت آیکون هر دسته‌بندی ===== ───
 function getCategoryIcon(category) {
     var iconMap = {
-        'تاریخ ایران': '🏛️',
+        'پادشاه': '👑',
         'دانشمندان': '🔬',
         'مخترعان': '💡',
         'کارآفرینان و فناوری': '🚀',
         'رهبران و فعالان': '✊',
         'فرمانروایان و ژنرال‌ها': '⚔️',
-        'فرمانروایان و ملکه‌ها': '👑',
         'هنرمندان': '🎨',
         'شاعران و ادیبان': '📜'
     };
@@ -160,6 +212,7 @@ window.searchAllTopics = function() {
             topicSearchInput.value = '';
         }
         noResults.classList.remove('show');
+        toggleClearButton('category');
         renderCategories(allTopicsData);
         return;
     }
@@ -272,6 +325,9 @@ window.selectCategory = function(category) {
         topicSearchInput.value = '';
     }
 
+    toggleClearButton('global');
+    toggleClearButton('category');
+
     renderTopicsByCategory(category);
 };
 
@@ -298,6 +354,9 @@ window.showCategories = function() {
     if (categorySearchInput) {
         categorySearchInput.value = '';
     }
+
+    toggleClearButton('global');
+    toggleClearButton('category');
 
     noResults.classList.remove('show');
     renderCategories(allTopicsData);
@@ -454,6 +513,8 @@ function navigate(pageName, pushState, extraData) {
         if (topicSearchInput) {
             topicSearchInput.value = '';
         }
+        toggleClearButton('global');
+        toggleClearButton('category');
         noResults.classList.remove('show');
         renderCategories(allTopicsData);
         if (downloadBtn) {
@@ -742,6 +803,8 @@ window.selectCategory = selectCategory;
 window.showCategories = showCategories;
 window.searchAllTopics = searchAllTopics;
 window.searchTopicsInCategory = searchTopicsInCategory;
+window.clearGlobalSearch = clearGlobalSearch;
+window.clearCategorySearch = clearCategorySearch;
 
 // ─── ===== ذرات پس‌زمینه (Particles) ===== ───
 function initParticles() {
