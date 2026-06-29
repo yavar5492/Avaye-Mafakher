@@ -333,10 +333,10 @@ nav {
   opacity: 1;
   transform: rotate(0deg) scale(1);
 }
-
 .theme-toggle-mobile {
   display: none;
   align-items: center;
+  justify-content: center;
   width: 100%;
   padding: 6px 20px;
   margin-top: 20px;
@@ -399,7 +399,8 @@ nav {
 /* ===== MOBILE MENU ===== */
 .mobile-menu {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-self: start;
   align-items: center;
   top: 250px;
   visibility: hidden;
@@ -429,7 +430,7 @@ nav {
   display: flex;
   align-items: center;
   font-weight: 500;
-  padding: 6px 20px;
+  padding: 15px 20px;
   transition: color 0.2s;
 }
 
@@ -657,6 +658,9 @@ nav {
 
 .category-card .category-icon {
   font-size: 2.8rem;
+}
+.category-card .category-icon img{
+  width: 40px;
 }
 
 .category-card h3 {

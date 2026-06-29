@@ -257,18 +257,67 @@ function getUniqueCategories(data) {
 }
 
 // ─── ===== دریافت آیکون هر دسته‌بندی ===== ───
+// ─── ===== دریافت آیکون هر دسته‌بندی (با تصاویر و LocalStorage) ===== ───
 function getCategoryIcon(category) {
-    var iconMap = {
-        'فرمانروایان و ژنرال‌ ها': '⚔️',
-        'دانشمندان': '🔬',
-        'مخترعان': '💡',
-        'کارآفرینان و فناوری': '🚀',
-        'رهبران و فعالان': '✊',
-        'ملکه ها': '👑',
-        'هنرمندان': '🎨',
-        'شاعران و ادیبان': '📜'
+    // آیکون‌های پیش‌فرض با مسیر تصاویر
+    var defaultIconMap = {
+        'فرمانروایان و ژنرال‌ ها': 'assets/icon/farman.png',
+        'دانشمندان': 'assets/icon/micros.png',
+        'مخترعان': 'assets/icon/mokh.png',
+        'کارآفرینان و فناوری': 'assets/icon/mosh.png',
+        'رهبران و فعالان': 'assets/icon/rahbar.png',
+        'ملکه ها': 'assets/icon/malake.png',
+        'هنرمندان': 'assets/icon/honarmand.png',
+        'شاعران و ادیبان': 'assets/icon/shaer.png'
     };
-    return iconMap[category] || '📁';
+    
+    // دریافت آیکون‌های ذخیره شده در LocalStorage
+    var savedIcons = localStorage.getItem('categoryIcons');
+    var customIconMap = {};
+    
+    if (savedIcons) {
+        try {
+            customIconMap = JSON.parse(savedIcons);
+        } catch (e) {
+            customIconMap = {};
+        }
+    }
+    
+    // اگر آیکون سفارشی وجود دارد، از آن استفاده کن
+    var iconPath = customIconMap[category] || defaultIconMap[category] || 'assets/icon/more.png';
+    
+    // برگرداندن تگ img کامل
+    return '<img src="' + iconPath + '" alt="' + category + '" class="category-icon-img" />';
+}
+
+// ─── ===== ذخیره آیکون سفارشی در LocalStorage ===== ───
+function setCategoryIcon(category, iconPath) {
+    var savedIcons = localStorage.getItem('categoryIcons');
+    var customIconMap = {};
+    
+    if (savedIcons) {
+        try {
+            customIconMap = JSON.parse(savedIcons);
+        } catch (e) {
+            customIconMap = {};
+        }
+    }
+    
+    customIconMap[category] = iconPath;
+    localStorage.setItem('categoryIcons', JSON.stringify(customIconMap));
+    
+    // به‌روزرسانی نمایش
+    if (typeof renderCategories !== 'undefined') {
+        renderCategories(allTopicsData);
+    }
+}
+
+// ─── ===== ریست کردن آیکون‌ها ===== ───
+function resetCategoryIcons() {
+    localStorage.removeItem('categoryIcons');
+    if (typeof renderCategories !== 'undefined') {
+        renderCategories(allTopicsData);
+    }
 }
 
 // ─── ===== دریافت استیکر هر موضوع ===== ───
